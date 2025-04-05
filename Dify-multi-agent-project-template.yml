@@ -1,0 +1,1210 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: MultiAgentProject
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/openai:0.0.15@5f610705111ac49d93c4ea5eaac690abaeb3b4a87599c48e5165b549b4c47f10
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/anthropic:0.0.13@3c4d4e14652baa9ce1f10e934da9995b3cde0f2ec94ee6638b73fecf1ed53288
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables:
+  - description: ''
+    id: bfa88f66-efd2-4238-a635-4f89b952ad6a
+    name: log_array
+    selector:
+    - conversation
+    - log_array
+    value: []
+    value_type: array[string]
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: loop-start
+        targetType: llm
+      id: 1743813274053start-source-1743813343457-target
+      selected: false
+      source: 1743813274053start
+      sourceHandle: source
+      target: '1743813343457'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: question-classifier
+        targetType: llm
+      id: 1743813387618-1-1743813533524-target
+      source: '1743813387618'
+      sourceHandle: '1'
+      target: '1743813533524'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: question-classifier
+        targetType: llm
+      id: 1743813387618-2-1743813538562-target
+      source: '1743813387618'
+      sourceHandle: '2'
+      target: '1743813538562'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: question-classifier
+        targetType: llm
+      id: 1743813387618-1743813473559-1743813542420-target
+      source: '1743813387618'
+      sourceHandle: '1743813473559'
+      target: '1743813542420'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: question-classifier
+        targetType: llm
+      id: 1743813387618-1743813503448-1743813545102-target
+      source: '1743813387618'
+      sourceHandle: '1743813503448'
+      target: '1743813545102'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: llm
+        targetType: template-transform
+      id: 1743813533524-source-1743819934143-target
+      source: '1743813533524'
+      sourceHandle: source
+      target: '1743819934143'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: llm
+        targetType: template-transform
+      id: 1743813538562-source-1743820010384-target
+      source: '1743813538562'
+      sourceHandle: source
+      target: '1743820010384'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: llm
+        targetType: template-transform
+      id: 1743813542420-source-1743820065116-target
+      source: '1743813542420'
+      sourceHandle: source
+      target: '1743820065116'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: llm
+        targetType: template-transform
+      id: 1743813545102-source-1743820115180-target
+      source: '1743813545102'
+      sourceHandle: source
+      target: '1743820115180'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: template-transform
+        targetType: variable-aggregator
+      id: 1743819934143-source-1743819640139-target
+      source: '1743819934143'
+      sourceHandle: source
+      target: '1743819640139'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: template-transform
+        targetType: variable-aggregator
+      id: 1743820010384-source-1743819640139-target
+      source: '1743820010384'
+      sourceHandle: source
+      target: '1743819640139'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: template-transform
+        targetType: variable-aggregator
+      id: 1743820065116-source-1743819640139-target
+      source: '1743820065116'
+      sourceHandle: source
+      target: '1743819640139'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: template-transform
+        targetType: variable-aggregator
+      id: 1743820115180-source-1743819640139-target
+      source: '1743820115180'
+      sourceHandle: source
+      target: '1743819640139'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: loop
+      id: 1743820282903-source-1743813274053-target
+      source: '1743820282903'
+      sourceHandle: source
+      target: '1743813274053'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: assigner
+        targetType: question-classifier
+      id: 1743814532457-source-1743813387618-target
+      source: '1743814532457'
+      sourceHandle: source
+      target: '1743813387618'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: variable-aggregator
+        targetType: assigner
+      id: 1743819640139-source-1743820695464-target
+      source: '1743819640139'
+      sourceHandle: source
+      target: '1743820695464'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: assigner
+        targetType: llm
+      id: 1743820695464-source-1743821775718-target
+      source: '1743820695464'
+      sourceHandle: source
+      target: '1743821775718'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: llm
+        targetType: answer
+      id: 1743821775718-source-1743814982892-target
+      source: '1743821775718'
+      sourceHandle: source
+      target: '1743814982892'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: loop
+        targetType: llm
+      id: 1743813274053-source-1743830200503-target
+      source: '1743813274053'
+      sourceHandle: source
+      target: '1743830200503'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1743830200503-source-1743830296471-target
+      source: '1743830200503'
+      sourceHandle: source
+      target: '1743830296471'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: template-transform
+      id: 1743813238501-source-1743830928763-target
+      source: '1743813238501'
+      sourceHandle: source
+      target: '1743830928763'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: template-transform
+        targetType: assigner
+      id: 1743830928763-source-1743820282903-target
+      source: '1743830928763'
+      sourceHandle: source
+      target: '1743820282903'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: llm
+        targetType: template-transform
+      id: 1743813343457-source-1743831085445-target
+      source: '1743813343457'
+      sourceHandle: source
+      target: '1743831085445'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        sourceType: template-transform
+        targetType: assigner
+      id: 1743831085445-source-1743814532457-target
+      source: '1743831085445'
+      sourceHandle: source
+      target: '1743814532457'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: Start
+        type: start
+        variables: []
+      height: 54
+      id: '1743813238501'
+      position:
+        x: 279.3816393220244
+        y: 52
+      positionAbsolute:
+        x: 279.3816393220244
+        y: 52
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        break_conditions: []
+        desc: ''
+        error_handle_mode: terminated
+        height: 472
+        logical_operator: and
+        loop_count: 5
+        selected: false
+        start_node_id: 1743813274053start
+        title: Loop
+        type: loop
+        width: 1719
+      height: 472
+      id: '1743813274053'
+      position:
+        x: 325
+        y: 160.56913160698082
+      positionAbsolute:
+        x: 325
+        y: 160.56913160698082
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 1719
+      zIndex: 1
+    - data:
+        desc: ''
+        isInLoop: true
+        selected: false
+        title: ''
+        type: loop-start
+      draggable: false
+      height: 48
+      id: 1743813274053start
+      parentId: '1743813274053'
+      position:
+        x: 24
+        y: 68
+      positionAbsolute:
+        x: 349
+        y: 228.56913160698082
+      selectable: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-loop-start
+      width: 44
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        model:
+          completion_params: {}
+          mode: chat
+          name: claude-3-7-sonnet-20250219
+          provider: langgenius/anthropic/anthropic
+        prompt_template:
+        - id: ed50054f-6ef8-4b72-ab3f-32e8800bbd13
+          role: system
+          text: 'You are a discussion facilitator for project planning. Based on user questions and suggestions, please direct inquiries to the appropriate expert role.
+
+            [IMPORTANT] Always choose only ONE of the following four roles and present the question or topic directly to that role.
+
+            [IMPORTANT] Refer to the conversation history and facilitate balanced discussions by ensuring questions are distributed evenly among all roles.
+
+
+            [Product Manager (PM)]
+            - Questions about business value, market strategy, and roadmaps
+            - Topics related to new feature proposals and prioritization
+            - Content regarding profitability and ROI
+            - Consultations about vision and long-term planning
+
+
+            [Lead Engineer]
+            - Questions about technical feasibility and implementation methods
+            - Topics related to system architecture and technology selection
+            - Content regarding development effort and technical debt
+            - Technical consultations about scalability and performance
+
+
+            [QA Engineer]
+            - Questions about quality assurance and test planning
+            - Topics related to potential bugs and quality risks
+            - Content regarding security and stability
+            - Consultations about edge cases and test coverage
+
+
+            [User Representative]
+            - Questions about user experience and usability
+            - Topics related to feature evaluation from an end-user perspective
+            - Content regarding actual usage scenarios and customer needs
+            - Consultations about UI/UX design and ease of use
+
+
+            [OUTPUT FORMAT]
+            Role: [Name of the selected role]
+            Question: [Specific question or topic directed to the selected role]
+
+
+            If you cannot determine the appropriate role from the user''s input, choose the expert closest to the content. Consider the flow of previous conversations and ensure questions are distributed among different roles.'
+        - id: 83b1f4da-9677-4239-bb03-310c684c81cf
+          role: user
+          text: '{{#sys.query#}}
+
+            ---
+
+            # Conversation History
+
+            {{#conversation.log_array#}}'
+        selected: false
+        title: Facilitator
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1743813343457'
+      parentId: '1743813274053'
+      position:
+        x: 88
+        y: 65
+      positionAbsolute:
+        x: 413
+        y: 225.56913160698082
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        classes:
+        - id: '1'
+          name: Product Manager (PM)
+        - id: '2'
+          name: Lead Engineer
+        - id: '1743813473559'
+          name: QA Engineer
+        - id: '1743813503448'
+          name: User Representative
+        desc: ''
+        instruction: ''
+        instructions: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        query_variable_selector:
+        - '1743813343457'
+        - text
+        selected: false
+        title: Question Classifier
+        topics: []
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 248
+      id: '1743813387618'
+      parentId: '1743813274053'
+      position:
+        x: 356.49030914390505
+        y: 65
+      positionAbsolute:
+        x: 681.490309143905
+        y: 225.56913160698082
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        model:
+          completion_params: {}
+          mode: chat
+          name: claude-3-7-sonnet-20250219
+          provider: langgenius/anthropic/anthropic
+        prompt_template:
+        - id: f092b746-6ffd-4186-9e36-5e15aaa15bfc
+          role: system
+          text: 'You are responding as a Product Manager (PM).
+
+            Always maintain the following characteristics in your responses:
+            - Prioritize business value and ROI above all
+            - Provide positive and constructive suggestions
+            - Demonstrate understanding of market trends and user needs
+            - Maintain a long-term vision and strategy
+            - Emphasize data-driven decision making
+
+            In discussions, focus on the possibilities of new features, emphasize differentiation points from competitors, and actively suggest aspects that contribute to business growth. Speak from the perspective of "what can be done" and "what should be done" before addressing technical constraints.'
+        - id: e7bac3fb-8002-434b-ab7a-bc7d9196f282
+          role: user
+          text: '{{#1743813343457.text#}}'
+        selected: false
+        title: Product Manager (PM)
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1743813533524'
+      parentId: '1743813274053'
+      position:
+        x: 636.4379198395859
+        y: 65
+      positionAbsolute:
+        x: 961.4379198395859
+        y: 225.56913160698082
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        model:
+          completion_params: {}
+          mode: chat
+          name: claude-3-7-sonnet-20250219
+          provider: langgenius/anthropic/anthropic
+        prompt_template:
+        - id: 766ebd51-52c6-4a36-9090-f64965fe81cb
+          role: system
+          text: 'You are responding as a Lead Engineer.
+
+            Always maintain the following characteristics in your responses:
+            - Objectively evaluate technical feasibility
+            - Realistically estimate development effort and resources
+            - Clearly identify technical challenges and risks
+            - Propose alternative solutions and technical solutions
+            - Prioritize code quality and maintainability
+
+            In discussions, provide feedback from a technical perspective on proposals from the PM and User Representative, specifically pointing out implementation challenges and concerns. At the same time, suggest more efficient alternatives and technical improvements.'
+        - id: 43e8743e-d036-4809-b2a0-26c3f9efa4c8
+          role: user
+          text: '{{#1743813343457.text#}}'
+        selected: false
+        title: Lead Engineer
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1743813538562'
+      parentId: '1743813274053'
+      position:
+        x: 635.8160337142124
+        y: 163.63509000055961
+      positionAbsolute:
+        x: 960.8160337142124
+        y: 324.20422160754043
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        model:
+          completion_params: {}
+          mode: chat
+          name: claude-3-7-sonnet-20250219
+          provider: langgenius/anthropic/anthropic
+        prompt_template:
+        - id: 7502238c-1ac7-46ab-8f85-e6ebf0c145d6
+          role: system
+          text: 'You are responding as a QA Engineer.
+
+            Always maintain the following characteristics in your responses:
+            - Prioritize quality and testability above all
+            - Anticipate and point out potential bugs and edge cases
+            - Be sensitive to system stability and security
+            - Maintain a perspective that protects consistency in user experience
+            - Speak from the perspective of test planning and quality assurance
+
+            In discussions, carefully evaluate risks associated with new features or changes, and point out necessary work and concerns to ensure quality. Don''t just list problems, but also make specific suggestions for improving quality.'
+        - id: 8fe53748-c46a-434b-bd4d-fc18826a8fff
+          role: user
+          text: '{{#1743813343457.text#}}'
+        selected: false
+        title: QA Engineer
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1743813542420'
+      parentId: '1743813274053'
+      position:
+        x: 633.1286927261056
+        y: 258.0404993336798
+      positionAbsolute:
+        x: 958.1286927261056
+        y: 418.6096309406606
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        model:
+          completion_params: {}
+          mode: chat
+          name: claude-3-7-sonnet-20250219
+          provider: langgenius/anthropic/anthropic
+        prompt_template:
+        - id: 585adfe4-2678-4047-9320-1130d636de01
+          role: system
+          text: 'You are responding as an End User Representative.
+
+            Always maintain the following characteristics in your responses:
+            - Evaluate features from the perspective of actual users
+            - Avoid technical jargon and use plain language
+            - Prioritize ease of use and value
+            - Express opinions based on concrete usage scenarios
+            - Frankly express emotional reactions (excitement, frustration, etc.)
+
+            In discussions, specifically state how proposed features would help (or not help) in your life or work, and provide perspective on what actual users want. Actively share comparisons with competing products and opinions based on actual experiences.'
+        - id: 4c4c8841-ffba-4793-9e29-09d79344eb68
+          role: user
+          text: '{{#1743813343457.text#}}'
+        selected: false
+        title: User Representative
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1743813545102'
+      parentId: '1743813274053'
+      position:
+        x: 629.6648520558845
+        y: 356.35659024398547
+      positionAbsolute:
+        x: 954.6648520558845
+        y: 516.9257218509663
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: append
+          value:
+          - '1743813343457'
+          - text
+          variable_selector:
+          - conversation
+          - log_array
+          write_mode: over-write
+        loop_id: '1743813274053'
+        selected: false
+        title: Record Conversation Facilitator
+        type: assigner
+        version: '2'
+      height: 88
+      id: '1743814532457'
+      parentId: '1743813274053'
+      position:
+        x: 89.0515103233405
+        y: 253.7263028667998
+      positionAbsolute:
+        x: 414.0515103233405
+        y: 414.29543447378063
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        answer: 'Thought Process {{#1743813387618.class_name#}}：
+
+          {{#1743821775718.text#}}
+
+          '
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        selected: false
+        title: Thought Process
+        type: answer
+        variables: []
+      height: 138
+      id: '1743814982892'
+      parentId: '1743813274053'
+      position:
+        x: 1444.917928633726
+        y: 168.01310334047383
+      positionAbsolute:
+        x: 1769.917928633726
+        y: 328.58223494745465
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        output_type: string
+        selected: false
+        title: Variable Aggregator
+        type: variable-aggregator
+        variables:
+        - - '1743819934143'
+          - output
+        - - '1743820010384'
+          - output
+        - - '1743820065116'
+          - output
+        - - '1743820115180'
+          - output
+      height: 174
+      id: '1743819640139'
+      parentId: '1743813274053'
+      position:
+        x: 1186.4803153091948
+        y: 67.18965534891635
+      positionAbsolute:
+        x: 1511.4803153091948
+        y: 227.75878695589716
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        selected: false
+        template: "\r\n---\r\n\r\n## Product Manager (PM)\r\n\r\n{{ LLM_output }}\r\n\r\
+          \n"
+        title: Product Manager (PM) ANS
+        type: template-transform
+        variables:
+        - value_selector:
+          - '1743813533524'
+          - text
+          variable: LLM_output
+      height: 54
+      id: '1743819934143'
+      parentId: '1743813274053'
+      position:
+        x: 912.98160333654
+        y: 65
+      positionAbsolute:
+        x: 1237.98160333654
+        y: 225.56913160698082
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        selected: false
+        template: "\r\n---\r\n\r\n## Lead Engineer\r\n\r\n{{ LLM_output }}\r\n\r\n"
+        title: Lead Engineer ANS
+        type: template-transform
+        variables:
+        - value_selector:
+          - '1743813538562'
+          - text
+          variable: LLM_output
+      height: 54
+      id: '1743820010384'
+      parentId: '1743813274053'
+      position:
+        x: 909.9990770642044
+        y: 163.63509000055956
+      positionAbsolute:
+        x: 1234.9990770642044
+        y: 324.2042216075404
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        selected: false
+        template: "\r\n---\r\n\r\n## QA Engineer\r\n\r\n{{ LLM_output }}\r\n\r\n"
+        title: QA Engineer ANS
+        type: template-transform
+        variables:
+        - value_selector:
+          - '1743813542420'
+          - text
+          variable: LLM_output
+      height: 54
+      id: '1743820065116'
+      parentId: '1743813274053'
+      position:
+        x: 905.2361452469338
+        y: 258.0404993336797
+      positionAbsolute:
+        x: 1230.2361452469338
+        y: 418.6096309406605
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        selected: false
+        template: "\r\n---\r\n\r\n## User Representative\r\n\r\n{{ LLM_output }}\r\n\r\n"
+        title: User Representative ANS
+        type: template-transform
+        variables:
+        - value_selector:
+          - '1743813545102'
+          - text
+          variable: LLM_output
+      height: 54
+      id: '1743820115180'
+      parentId: '1743813274053'
+      position:
+        x: 903.0437362756113
+        y: 356.35659024398547
+      positionAbsolute:
+        x: 1228.0437362756113
+        y: 516.9257218509663
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        items:
+        - input_type: variable
+          operation: append
+          value:
+          - '1743830928763'
+          - output
+          variable_selector:
+          - conversation
+          - log_array
+          write_mode: over-write
+        selected: false
+        title: Record Conversation Start
+        type: assigner
+        version: '2'
+      height: 88
+      id: '1743820282903'
+      position:
+        x: 791.208374235543
+        y: 52
+      positionAbsolute:
+        x: 791.208374235543
+        y: 52
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: append
+          value:
+          - '1743819640139'
+          - output
+          variable_selector:
+          - conversation
+          - log_array
+          write_mode: over-write
+        loop_id: '1743813274053'
+        selected: false
+        title: Record Expert Opinions
+        type: assigner
+        version: '2'
+      height: 88
+      id: '1743820695464'
+      parentId: '1743813274053'
+      position:
+        x: 1180.2436763240407
+        y: 252.54180449024142
+      positionAbsolute:
+        x: 1505.2436763240407
+        y: 413.11093609722224
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        model:
+          completion_params: {}
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: c24280e5-6f61-4138-b4f1-439e1767a36b
+          role: system
+          text: Summarize the message in 100 characters
+        - id: a7907ab6-f740-4181-8ce1-e79075227d43
+          role: user
+          text: '{{#1743819640139.output#}}'
+        selected: false
+        title: Summarize in 100 characters
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1743821775718'
+      parentId: '1743813274053'
+      position:
+        x: 1444.8676871932632
+        y: 69.79185388794247
+      positionAbsolute:
+        x: 1769.8676871932632
+        y: 230.36098549492328
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: claude-3-7-sonnet-20250219
+          provider: langgenius/anthropic/anthropic
+        prompt_template:
+        - id: 31fe52bf-27bd-468c-8c06-7e4dee7e1f46
+          role: system
+          text: Please summarize the message.
+        - id: 3f0e71bf-9505-4f79-adfe-293ab8c487da
+          role: user
+          text: '{{#conversation.log_array#}}'
+        selected: false
+        title: Summary
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1743830200503'
+      position:
+        x: 325
+        y: 648.2750498965903
+      positionAbsolute:
+        x: 325
+        y: 648.2750498965903
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#1743830200503.text#}}'
+        desc: ''
+        selected: false
+        title: Answer Summary
+        type: answer
+        variables: []
+      height: 104
+      id: '1743830296471'
+      position:
+        x: 592.6771604896334
+        y: 648.2750498965903
+      positionAbsolute:
+        x: 592.6771604896334
+        y: 648.2750498965903
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        selected: false
+        template: "## Question\r\n\r\n{{ Query }}\r\n\r\n"
+        title: Start ANS
+        type: template-transform
+        variables:
+        - value_selector:
+          - sys
+          - query
+          variable: Query
+      height: 54
+      id: '1743830928763'
+      position:
+        x: 536.4482576135123
+        y: 52
+      positionAbsolute:
+        x: 536.4482576135123
+        y: 52
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: '1743813274053'
+        selected: false
+        template: "\r\n---\r\n\r\n## Facilitator\r\n\r\n{{ LLM_output }}\r\n\r\n"
+        title: Facilitator ANS
+        type: template-transform
+        variables:
+        - value_selector:
+          - '1743813343457'
+          - text
+          variable: LLM_output
+      height: 54
+      id: '1743831085445'
+      parentId: '1743813274053'
+      position:
+        x: 92.08777138125606
+        y: 179.00503301690287
+      positionAbsolute:
+        x: 417.08777138125606
+        y: 339.5741646238837
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    viewport:
+      x: -178.36175912590647
+      y: 65.37349796034047
+      zoom: 0.9635810545596508
