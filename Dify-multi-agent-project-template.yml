@@ -5,15 +5,6 @@ app:
   mode: advanced-chat
   name: ITプロジェクト
   use_icon_as_answer_icon: false
-dependencies:
-- current_identifier: null
-  type: marketplace
-  value:
-    marketplace_plugin_unique_identifier: langgenius/openai:0.0.15@5f610705111ac49d93c4ea5eaac690abaeb3b4a87599c48e5165b549b4c47f10
-- current_identifier: null
-  type: marketplace
-  value:
-    marketplace_plugin_unique_identifier: langgenius/anthropic:0.0.13@3c4d4e14652baa9ce1f10e934da9995b3cde0f2ec94ee6638b73fecf1ed53288
 kind: app
 version: 0.1.5
 workflow:
@@ -456,8 +447,8 @@ workflow:
         model:
           completion_params: {}
           mode: chat
-          name: claude-3-7-sonnet-20250219
-          provider: langgenius/anthropic/anthropic
+          name: gpt-oss-20b-mlx
+          provider: langgenius/openai_api_compatible/openai_api_compatible
         prompt_template:
         - id: ed50054f-6ef8-4b72-ab3f-32e8800bbd13
           role: system
@@ -571,8 +562,8 @@ workflow:
           completion_params:
             temperature: 0.7
           mode: chat
-          name: gpt-4o-mini
-          provider: langgenius/openai/openai
+          name: gpt-oss-20b-mlx
+          provider: langgenius/openai_api_compatible/openai_api_compatible
         query_variable_selector:
         - '1743813343457'
         - text
@@ -608,8 +599,8 @@ workflow:
         model:
           completion_params: {}
           mode: chat
-          name: claude-3-7-sonnet-20250219
-          provider: langgenius/anthropic/anthropic
+          name: gpt-oss-20b-mlx
+          provider: langgenius/openai_api_compatible/openai_api_compatible
         prompt_template:
         - id: f092b746-6ffd-4186-9e36-5e15aaa15bfc
           role: system
@@ -665,8 +656,8 @@ workflow:
         model:
           completion_params: {}
           mode: chat
-          name: claude-3-7-sonnet-20250219
-          provider: langgenius/anthropic/anthropic
+          name: gpt-oss-20b-mlx
+          provider: langgenius/openai_api_compatible/openai_api_compatible
         prompt_template:
         - id: 766ebd51-52c6-4a36-9090-f64965fe81cb
           role: system
@@ -722,8 +713,8 @@ workflow:
         model:
           completion_params: {}
           mode: chat
-          name: claude-3-7-sonnet-20250219
-          provider: langgenius/anthropic/anthropic
+          name: gpt-oss-20b-mlx
+          provider: langgenius/openai_api_compatible/openai_api_compatible
         prompt_template:
         - id: 7502238c-1ac7-46ab-8f85-e6ebf0c145d6
           role: system
@@ -779,8 +770,8 @@ workflow:
         model:
           completion_params: {}
           mode: chat
-          name: claude-3-7-sonnet-20250219
-          provider: langgenius/anthropic/anthropic
+          name: gpt-oss-20b-mlx
+          provider: langgenius/openai_api_compatible/openai_api_compatible
         prompt_template:
         - id: 585adfe4-2678-4047-9320-1130d636de01
           role: system
@@ -1112,8 +1103,8 @@ workflow:
         model:
           completion_params: {}
           mode: chat
-          name: gpt-4o-mini
-          provider: langgenius/openai/openai
+          name: gpt-oss-20b-mlx
+          provider: langgenius/openai_api_compatible/openai_api_compatible
         prompt_template:
         - id: c24280e5-6f61-4138-b4f1-439e1767a36b
           role: system
@@ -1150,8 +1141,8 @@ workflow:
         model:
           completion_params: {}
           mode: chat
-          name: claude-3-7-sonnet-20250219
-          provider: langgenius/anthropic/anthropic
+          name: gpt-oss-20b-mlx
+          provider: langgenius/openai_api_compatible/openai_api_compatible
         prompt_template:
         - id: 31fe52bf-27bd-468c-8c06-7e4dee7e1f46
           role: system
