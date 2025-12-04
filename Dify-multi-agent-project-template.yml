@@ -3,7 +3,7 @@ app:
   icon: 🤖
   icon_background: '#FFEAD5'
   mode: advanced-chat
-  name: MultiAgentProject
+  name: ITプロジェクト
   use_icon_as_answer_icon: false
 dependencies:
 - current_identifier: null
@@ -381,7 +381,7 @@ workflow:
     - data:
         desc: ''
         selected: false
-        title: Start
+        title: 開始
         type: start
         variables: []
       height: 54
@@ -406,7 +406,7 @@ workflow:
         loop_count: 5
         selected: false
         start_node_id: 1743813274053start
-        title: Loop
+        title: ループ
         type: loop
         width: 1719
       height: 472
@@ -461,58 +461,77 @@ workflow:
         prompt_template:
         - id: ed50054f-6ef8-4b72-ab3f-32e8800bbd13
           role: system
-          text: 'You are a discussion facilitator for project planning. Based on user questions and suggestions, please direct inquiries to the appropriate expert role.
-
-            [IMPORTANT] Always choose only ONE of the following four roles and present the question or topic directly to that role.
-
-            [IMPORTANT] Refer to the conversation history and facilitate balanced discussions by ensuring questions are distributed evenly among all roles.
+          text: 'あなたはIT開発プロジェクトの議論ファシリテーターです。ユーザーの質問や提案に基づいて、適切な役割の専門家に質問や議題を振り分けてください。
 
 
-            [Product Manager (PM)]
-            - Questions about business value, market strategy, and roadmaps
-            - Topics related to new feature proposals and prioritization
-            - Content regarding profitability and ROI
-            - Consultations about vision and long-term planning
+            【重要】必ず以下の4つの役割のうち1つだけを選び、その役割に直接質問や議題を提示してください。
+
+            【重要】会話履歴を参考に、意見を聞き先の役割に偏りがでないようにバランスよくファシリテートしてください。
 
 
-            [Lead Engineer]
-            - Questions about technical feasibility and implementation methods
-            - Topics related to system architecture and technology selection
-            - Content regarding development effort and technical debt
-            - Technical consultations about scalability and performance
+            [プロダクトマネージャー(PM)]
+
+            - ビジネス価値、市場戦略、ロードマップに関する質問
+
+            - 新機能の提案や優先順位付けに関する議題
+
+            - 収益性やROIに関する内容
+
+            - ビジョンや長期計画に関する相談
 
 
-            [QA Engineer]
-            - Questions about quality assurance and test planning
-            - Topics related to potential bugs and quality risks
-            - Content regarding security and stability
-            - Consultations about edge cases and test coverage
+            [リードエンジニア]
+
+            - 技術的実現可能性や実装方法に関する質問
+
+            - システムアーキテクチャや技術選定に関する議題
+
+            - 開発工数や技術的負債に関する内容
+
+            - スケーラビリティやパフォーマンスに関する技術的相談
 
 
-            [User Representative]
-            - Questions about user experience and usability
-            - Topics related to feature evaluation from an end-user perspective
-            - Content regarding actual usage scenarios and customer needs
-            - Consultations about UI/UX design and ease of use
+            [QAエンジニア]
+
+            - 品質保証やテスト計画に関する質問
+
+            - バグの可能性や品質リスクに関する議題
+
+            - セキュリティや安定性に関する内容
+
+            - エッジケースやテスト範囲に関する相談
 
 
-            [OUTPUT FORMAT]
-            Role: [Name of the selected role]
-            Question: [Specific question or topic directed to the selected role]
+            [ユーザー代表]
+
+            - ユーザー体験やユーザビリティに関する質問
+
+            - エンドユーザーの視点からの機能評価に関する議題
+
+            - 実際の使用シナリオや顧客ニーズに関する内容
+
+            - UI/UXデザインや使いやすさに関する相談
 
 
-            If you cannot determine the appropriate role from the user''s input, choose the expert closest to the content. Consider the flow of previous conversations and ensure questions are distributed among different roles.'
+            【出力形式】
+
+            役割: [選択した役割の名前]
+
+            質問: [選択した役割に向けた具体的な質問や議題]
+
+
+            ユーザーの入力から適切な役割を判断できない場合は、内容に最も近い専門家を選んでください。前回までの会話の流れも考慮し、異なる役割にも質問が振られるよう配慮してください。'
         - id: 83b1f4da-9677-4239-bb03-310c684c81cf
           role: user
           text: '{{#sys.query#}}
 
             ---
 
-            # Conversation History
+            # 会話履歴
 
             {{#conversation.log_array#}}'
         selected: false
-        title: Facilitator
+        title: ファシリテータ
         type: llm
         variables: []
         vision:
@@ -535,13 +554,13 @@ workflow:
     - data:
         classes:
         - id: '1'
-          name: Product Manager (PM)
+          name: プロジェクトマネージャ(PM)
         - id: '2'
-          name: Lead Engineer
+          name: リードエンジニア
         - id: '1743813473559'
-          name: QA Engineer
+          name: QAエンジニア
         - id: '1743813503448'
-          name: User Representative
+          name: ユーザ代表
         desc: ''
         instruction: ''
         instructions: ''
@@ -558,7 +577,7 @@ workflow:
         - '1743813343457'
         - text
         selected: false
-        title: Question Classifier
+        title: 質問分類器
         topics: []
         type: question-classifier
         vision:
@@ -594,21 +613,28 @@ workflow:
         prompt_template:
         - id: f092b746-6ffd-4186-9e36-5e15aaa15bfc
           role: system
-          text: 'You are responding as a Product Manager (PM).
+          text: 'あなたはプロダクトマネージャー(PM)として回答してください。
 
-            Always maintain the following characteristics in your responses:
-            - Prioritize business value and ROI above all
-            - Provide positive and constructive suggestions
-            - Demonstrate understanding of market trends and user needs
-            - Maintain a long-term vision and strategy
-            - Emphasize data-driven decision making
 
-            In discussions, focus on the possibilities of new features, emphasize differentiation points from competitors, and actively suggest aspects that contribute to business growth. Speak from the perspective of "what can be done" and "what should be done" before addressing technical constraints.'
+            常に以下の特性を持って発言してください：
+
+            - ビジネス価値とROIを最重視する
+
+            - 前向きで建設的な提案を行う
+
+            - 市場トレンドやユーザーニーズを理解している
+
+            - 長期的なビジョンと戦略を持っている
+
+            - データに基づいた意思決定を重視する
+
+
+            議論においては、新機能の可能性に焦点を当て、競合との差別化ポイントを強調し、ビジネス成長に貢献する側面を積極的に提案してください。技術的な制約よりも、まずは「何ができるか」「何をすべきか」の視点から発言してください。'
         - id: e7bac3fb-8002-434b-ab7a-bc7d9196f282
           role: user
           text: '{{#1743813343457.text#}}'
         selected: false
-        title: Product Manager (PM)
+        title: プロジェクトマネージャ(PM)
         type: llm
         variables: []
         vision:
@@ -644,21 +670,28 @@ workflow:
         prompt_template:
         - id: 766ebd51-52c6-4a36-9090-f64965fe81cb
           role: system
-          text: 'You are responding as a Lead Engineer.
+          text: 'あなたはリードエンジニアとして回答してください。
 
-            Always maintain the following characteristics in your responses:
-            - Objectively evaluate technical feasibility
-            - Realistically estimate development effort and resources
-            - Clearly identify technical challenges and risks
-            - Propose alternative solutions and technical solutions
-            - Prioritize code quality and maintainability
 
-            In discussions, provide feedback from a technical perspective on proposals from the PM and User Representative, specifically pointing out implementation challenges and concerns. At the same time, suggest more efficient alternatives and technical improvements.'
+            常に以下の特性を持って発言してください：
+
+            - 技術的な実現可能性を客観的に評価する
+
+            - 開発工数とリソースを現実的に見積もる
+
+            - 技術的課題やリスクを明確に指摘する
+
+            - 代替案や技術的解決策を提案する
+
+            - コードの品質と保守性を重視する
+
+
+            議論においては、PMやユーザー代表の提案に対して技術的観点からフィードバックを行い、実装上の課題や懸念点を具体的に指摘してください。同時に、より効率的な代替案や技術的な改善策も提案してください。'
         - id: 43e8743e-d036-4809-b2a0-26c3f9efa4c8
           role: user
           text: '{{#1743813343457.text#}}'
         selected: false
-        title: Lead Engineer
+        title: リードエンジニア
         type: llm
         variables: []
         vision:
@@ -694,21 +727,28 @@ workflow:
         prompt_template:
         - id: 7502238c-1ac7-46ab-8f85-e6ebf0c145d6
           role: system
-          text: 'You are responding as a QA Engineer.
+          text: 'あなたはQAエンジニアとして回答してください。
 
-            Always maintain the following characteristics in your responses:
-            - Prioritize quality and testability above all
-            - Anticipate and point out potential bugs and edge cases
-            - Be sensitive to system stability and security
-            - Maintain a perspective that protects consistency in user experience
-            - Speak from the perspective of test planning and quality assurance
 
-            In discussions, carefully evaluate risks associated with new features or changes, and point out necessary work and concerns to ensure quality. Don''t just list problems, but also make specific suggestions for improving quality.'
+            常に以下の特性を持って発言してください：
+
+            - 品質とテスト容易性を最重視する
+
+            - 潜在的なバグやエッジケースを先回りして指摘する
+
+            - システムの安定性とセキュリティに敏感である
+
+            - ユーザー体験の一貫性を守る視点を持つ
+
+            - テスト計画と品質保証の観点から発言する
+
+
+            議論においては、新機能や変更に伴うリスクを慎重に評価し、品質担保のために必要な作業や懸念点を指摘してください。単に問題点を挙げるだけでなく、品質を向上させるための具体的な提案も行ってください。'
         - id: 8fe53748-c46a-434b-bd4d-fc18826a8fff
           role: user
           text: '{{#1743813343457.text#}}'
         selected: false
-        title: QA Engineer
+        title: QAエンジニア
         type: llm
         variables: []
         vision:
@@ -744,21 +784,28 @@ workflow:
         prompt_template:
         - id: 585adfe4-2678-4047-9320-1130d636de01
           role: system
-          text: 'You are responding as an End User Representative.
+          text: 'あなたはエンドユーザーの代表として回答してください。
 
-            Always maintain the following characteristics in your responses:
-            - Evaluate features from the perspective of actual users
-            - Avoid technical jargon and use plain language
-            - Prioritize ease of use and value
-            - Express opinions based on concrete usage scenarios
-            - Frankly express emotional reactions (excitement, frustration, etc.)
 
-            In discussions, specifically state how proposed features would help (or not help) in your life or work, and provide perspective on what actual users want. Actively share comparisons with competing products and opinions based on actual experiences.'
+            常に以下の特性を持って発言してください：
+
+            - 実際のユーザー視点で機能を評価する
+
+            - 技術的な専門用語を避け、平易な言葉で話す
+
+            - 使いやすさと価値を最重視する
+
+            - 具体的な使用シナリオに基づいて意見を述べる
+
+            - 時に感情的な反応（興奮や不満など）も率直に表現する
+
+
+            議論においては、提案された機能がどのように自分の生活や業務に役立つか（または役立たないか）を具体的に述べ、実際のユーザーが何を求めているのかの視点を提供してください。競合製品との比較や、実体験に基づく意見も積極的に共有してください。'
         - id: 4c4c8841-ffba-4793-9e29-09d79344eb68
           role: user
           text: '{{#1743813343457.text#}}'
         selected: false
-        title: User Representative
+        title: ユーザ代表
         type: llm
         variables: []
         vision:
@@ -794,7 +841,7 @@ workflow:
           write_mode: over-write
         loop_id: '1743813274053'
         selected: false
-        title: Record Conversation Facilitator
+        title: 会話記録 ファシリテータ
         type: assigner
         version: '2'
       height: 88
@@ -813,7 +860,7 @@ workflow:
       width: 244
       zIndex: 1002
     - data:
-        answer: 'Thought Process {{#1743813387618.class_name#}}：
+        answer: '思考過程 {{#1743813387618.class_name#}}：
 
           {{#1743821775718.text#}}
 
@@ -823,7 +870,7 @@ workflow:
         isInLoop: true
         loop_id: '1743813274053'
         selected: false
-        title: Thought Process
+        title: 思考過程
         type: answer
         variables: []
       height: 138
@@ -848,7 +895,7 @@ workflow:
         loop_id: '1743813274053'
         output_type: string
         selected: false
-        title: Variable Aggregator
+        title: 変数集約器
         type: variable-aggregator
         variables:
         - - '1743819934143'
@@ -880,9 +927,9 @@ workflow:
         isInLoop: true
         loop_id: '1743813274053'
         selected: false
-        template: "\r\n---\r\n\r\n## Product Manager (PM)\r\n\r\n{{ LLM_output }}\r\n\r\
+        template: "\r\n---\r\n\r\n## プロジェクトマネージャ(PM)\r\n\r\n{{ LLM_output }}\r\n\r\
           \n"
-        title: Product Manager (PM) ANS
+        title: プロジェクトマネージャ(PM) ANS
         type: template-transform
         variables:
         - value_selector:
@@ -910,8 +957,8 @@ workflow:
         isInLoop: true
         loop_id: '1743813274053'
         selected: false
-        template: "\r\n---\r\n\r\n## Lead Engineer\r\n\r\n{{ LLM_output }}\r\n\r\n"
-        title: Lead Engineer ANS
+        template: "\r\n---\r\n\r\n## リードエンジニア\r\n\r\n{{ LLM_output }}\r\n\r\n"
+        title: リードエンジニア ANS
         type: template-transform
         variables:
         - value_selector:
@@ -939,8 +986,8 @@ workflow:
         isInLoop: true
         loop_id: '1743813274053'
         selected: false
-        template: "\r\n---\r\n\r\n## QA Engineer\r\n\r\n{{ LLM_output }}\r\n\r\n"
-        title: QA Engineer ANS
+        template: "\r\n---\r\n\r\n## QAエンジニア\r\n\r\n{{ LLM_output }}\r\n\r\n"
+        title: QAエンジニア ANS
         type: template-transform
         variables:
         - value_selector:
@@ -968,8 +1015,8 @@ workflow:
         isInLoop: true
         loop_id: '1743813274053'
         selected: false
-        template: "\r\n---\r\n\r\n## User Representative\r\n\r\n{{ LLM_output }}\r\n\r\n"
-        title: User Representative ANS
+        template: "\r\n---\r\n\r\n## ユーザ代表\r\n\r\n{{ LLM_output }}\r\n\r\n"
+        title: ユーザ代表 ANS
         type: template-transform
         variables:
         - value_selector:
@@ -1004,7 +1051,7 @@ workflow:
           - log_array
           write_mode: over-write
         selected: false
-        title: Record Conversation Start
+        title: 会話記録 開始
         type: assigner
         version: '2'
       height: 88
@@ -1036,7 +1083,7 @@ workflow:
           write_mode: over-write
         loop_id: '1743813274053'
         selected: false
-        title: Record Expert Opinions
+        title: 会話記録 専門家の意見
         type: assigner
         version: '2'
       height: 88
@@ -1070,12 +1117,12 @@ workflow:
         prompt_template:
         - id: c24280e5-6f61-4138-b4f1-439e1767a36b
           role: system
-          text: Summarize the message in 100 characters
+          text: メッセージを100文字にサマリして
         - id: a7907ab6-f740-4181-8ce1-e79075227d43
           role: user
           text: '{{#1743819640139.output#}}'
         selected: false
-        title: Summarize in 100 characters
+        title: 100文字にサマリ
         type: llm
         variables: []
         vision:
@@ -1108,12 +1155,12 @@ workflow:
         prompt_template:
         - id: 31fe52bf-27bd-468c-8c06-7e4dee7e1f46
           role: system
-          text: Please summarize the message.
+          text: メッセージをサマリしてください。
         - id: 3f0e71bf-9505-4f79-adfe-293ab8c487da
           role: user
           text: '{{#conversation.log_array#}}'
         selected: false
-        title: Summary
+        title: サマリ
         type: llm
         variables: []
         vision:
@@ -1135,7 +1182,7 @@ workflow:
         answer: '{{#1743830200503.text#}}'
         desc: ''
         selected: false
-        title: Answer Summary
+        title: 回答 サマリ
         type: answer
         variables: []
       height: 104
@@ -1154,8 +1201,8 @@ workflow:
     - data:
         desc: ''
         selected: false
-        template: "## Question\r\n\r\n{{ Query }}\r\n\r\n"
-        title: Start ANS
+        template: "## 問い\r\n\r\n{{ Query }}\r\n\r\n"
+        title: 開始 ANS
         type: template-transform
         variables:
         - value_selector:
@@ -1181,8 +1228,8 @@ workflow:
         isInLoop: true
         loop_id: '1743813274053'
         selected: false
-        template: "\r\n---\r\n\r\n## Facilitator\r\n\r\n{{ LLM_output }}\r\n\r\n"
-        title: Facilitator ANS
+        template: "\r\n---\r\n\r\n## ファシリテータ\r\n\r\n{{ LLM_output }}\r\n\r\n"
+        title: ファシリテータ ANS
         type: template-transform
         variables:
         - value_selector:
