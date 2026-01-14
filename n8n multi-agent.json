@@ -1,0 +1,819 @@
+{
+  "name": "n8n multi-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "multi-agent",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "27076781-50b6-4367-bed9-9bd17bb86af3",
+      "name": "Webhook (POST)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        3568
+      ],
+      "webhookId": "9131f1f8-4a10-454a-8792-f24a59dcdb95"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "query",
+              "value": "={{$json.body?.query ?? $json.body?.text ?? $json.query ?? $json.text ?? (typeof $json.body === 'string' ? $json.body : JSON.stringify($json.body ?? {}))}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "190aebca-a1c7-463b-92da-695a447ce176",
+      "name": "Extract query",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        3568
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Init log_array (staticData) 置き換え例\nconst sd = $getWorkflowStaticData('global');\n\n// 1) session_id を webhook から受け取る（クライアント側で固定IDを渡す想定）\nconst body = $('Webhook (POST)').first().json.body || {};\nconst sessionId = body.session_id || body.conversation_id || body.user_id || 'default';\n\n// 2) セッション辞書を用意\nsd.sessions = sd.sessions || {};\n\n// 3) 既存セッションをロード（なければ新規）\nconst now = Date.now();\nconst sess = sd.sessions[sessionId] || { log_array: [], updatedAt: now };\n\n// 4) 今回の入力を追記（Difyの「開始 ANS」相当）\nconst query = $('Extract query').first().json.query; // 既存の流れに合わせて適宜\nsess.log_array.push(`## 問い\\n\\n${query}`);\nsess.updatedAt = now;\n\n// 5) 肥大化対策：直近N件だけ保持（例：200セクション）\nconst MAX = 200;\nif (sess.log_array.length > MAX) sess.log_array = sess.log_array.slice(-MAX);\n\n// 6) 反映\nsd.sessions[sessionId] = sess;\n\n// 7) 既存ノード互換のため、sd.log_array / sd.query を“参照”としてもセット\nsd.session_id = sessionId;\nsd.query = query;\nsd.log_array = sess.log_array;\n\n// ついでに古いセッションを掃除（例：7日以上更新ないもの）\nconst TTL = 7 * 24 * 60 * 60 * 1000;\nfor (const [k, v] of Object.entries(sd.sessions)) {\n  if (!v?.updatedAt || (now - v.updatedAt) > TTL) delete sd.sessions[k];\n}\n\nreturn [{ json: { query, session_id: sessionId } }];\n"
+      },
+      "id": "da3f3e00-55db-4d32-9d0c-cb7a4d2750cd",
+      "name": "Init log_array (staticData)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        3568
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Create 5 iterations (Dify loop max_count = 5)\nreturn Array.from({ length: 5 }, (_, i) => ({ json: { iter: i + 1 } }));"
+      },
+      "id": "0d4d736a-fee2-4419-a345-a3150628ffd4",
+      "name": "Make 5 iterations",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1872,
+        3568
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "2ec1edbe-74b6-48b4-9fbb-a431293a5d8c",
+      "name": "Loop (SplitInBatches)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1472,
+        3872
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst query = sd.query;\nconst history = (sd.log_array || []).join(\"\\n\");\n\nconst systemContent = `あなたはIT開発プロジェクトの議論ファシリテーターです。ユーザーの質問や提案に基づいて、適切な役割の専門家に質問や議題を振り分けてください。\n\n【重要】必ず以下の4つの役割のうち1つだけを選び、その役割に直接質問や議題を提示してください。\n\n【重要】会話履歴を参考に、意見を聞き先の役割に偏りがでないようにバランスよくファシリテートしてください。\n\n[プロダクトマネージャー(PM)]\n- ビジネス価値、市場戦略、ロードマップに関する質問\n- 新機能の提案や優先順位付けに関する議題\n- 収益性やROIに関する内容\n- ビジョンや長期計画に関する相談\n\n[リードエンジニア]\n- 技術的実現可能性や実装方法に関する質問\n- システムアーキテクチャや技術選定に関する議題\n- 開発工数や技術的負債に関する内容\n- スケーラビリティやパフォーマンスに関する技術的相談\n\n[QAエンジニア]\n- 品質保証やテスト計画に関する質問\n- バグの可能性や品質リスクに関する議題\n- セキュリティや安定性に関する内容\n- エッジケースやテスト範囲に関する相談\n\n[ユーザー代表]\n- ユーザー体験やユーザビリティに関する質問\n- エンドユーザーの視点からの機能評価に関する議題\n- 実際の使用シナリオや顧客ニーズに関する内容\n- UI/UXデザインや使いやすさに関する相談\n\n【出力形式】\n\n役割: [選択した役割の名前]\n\n質問: [選択した役割に向けた具体的な質問や議題]\n\nユーザーの入力から適切な役割を判断できない場合は、内容に最も近い専門家を選んでください。前回までの会話の流れも考慮し、異なる役割にも質問が振られるよう配慮してください。`;\n\nconst userContent = `${query}\n\n---\n\n# 会話履歴\n\n${history}`;\n\nreturn [{\n  json: {\n    iter: $json.iter,\n    messages: [\n      { role: 'system', content: systemContent },\n      { role: 'user', content: userContent }\n    ]\n  }\n}];"
+      },
+      "id": "4303f685-67ae-4d64-abec-049d67678721",
+      "name": "Prepare Facilitator messages",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        3888
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook (POST)').first().json.body.base_url + ('/chat/completions')}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"{{$('Webhook (POST)').first().json.body.model_id}}\",\n  \"messages\": {{ JSON.stringify($json.messages) }}\n}",
+        "options": {}
+      },
+      "id": "f0951a34-b600-4837-ae55-8a5827c9308e",
+      "name": "OpenAI HTTP - Facilitator",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1936,
+        3888
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\n// Ensure the array exists\nif (!sd.log_array) {\n  sd.log_array = [];\n}\nconst text = $json.choices?.[0]?.message?.content ?? $json.choices?.[0]?.text ?? '';\n// Dify: template \"ファシリテータ ANS\"\nconst section = `---\\n\\n## ファシリテータ\\n\\n${text}`;\nsd.log_array.push(section);\nreturn [{ json: { iter: $node[\"Prepare Facilitator messages\"].json.iter, facilitator_text: text } }];"
+      },
+      "id": "1557df6e-bdc0-4d94-a660-07d553db21a6",
+      "name": "Append Facilitator to log_array",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        3888
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.roleKey }}",
+                    "rightValue": "PM",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6bb95351-8c87-493d-96f7-af42bb07697c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "d1a83e3f-0809-4237-bd24-5ae262c94e45",
+                    "leftValue": "={{ $json.roleKey }}",
+                    "rightValue": "LEAD",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "8c67504b-7adf-4d52-9084-1c0ff98f026e",
+                    "leftValue": "={{ $json.roleKey }}",
+                    "rightValue": "QA",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "e828d09d-b0cb-4d58-b6aa-9887e6bf82ed",
+                    "leftValue": "={{ $json.roleKey }}",
+                    "rightValue": "USER",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9bdd16f0-5f5b-45df-a8fd-75cdb58791b4",
+      "name": "Switch by role",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1616,
+        4112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook (POST)').first().json.body.base_url + ('/chat/completions')}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"{{$('Webhook (POST)').first().json.body.model_id}}\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"あなたはプロダクトマネージャー(PM)として回答してください。\\n\\n常に以下の特性を持って発言してください：\\n- ビジネス価値とROIを最重視する\\n- 前向きで建設的な提案を行う\\n- 市場トレンドやユーザーニーズを理解している\\n- 長期的なビジョンと戦略を持っている\\n- データに基づいた意思決定を重視する\\n\\n議論においては、新機能の可能性に焦点を当て、競合との差別化ポイントを強調し、ビジネス成長に貢献する側面を積極的に提案してください。技術的な制約よりも、まずは「何ができるか」「何をすべきか」の視点から発言してください。\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": {{JSON.stringify( $json.facilitator_text )}}\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "8bc733b2-9fdb-4f28-b59c-3f52b7122f03",
+      "name": "OpenAI HTTP - PM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1840,
+        4128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst text = $json.choices?.[0]?.message?.content ?? $json.choices?.[0]?.text ?? '';\nconst section = `---\\n\\n## プロジェクトマネージャ(PM)\\n\\n${text}`;\nsd.log_array.push(section);\nreturn [{ json: { ok: true, roleKey: 'PM' } }];"
+      },
+      "id": "3646cfcd-0bcb-48fd-8256-c2e4b099b6e7",
+      "name": "Append PM to log_array",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2064,
+        4128
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook (POST)').first().json.body.base_url + ('/chat/completions')}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"{{$('Webhook (POST)').first().json.body.model_id}}\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"あなたはリードエンジニアとして回答してください。\\n\\n常に以下の特性を持って発言してください：\\n- 技術的な実現可能性を客観的に評価する\\n- 開発工数とリソースを現実的に見積もる\\n- 技術的課題やリスクを明確に指摘する\\n- 代替案や技術的解決策を提案する\\n- コードの品質と保守性を重視する\\n\\n議論においては、PMやユーザー代表の提案に対して技術的観点からフィードバックを行い、実装上の課題や懸念点を具体的に指摘してください。同時に、より効率的な代替案や技術的な改善策も提案してください。\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": {{JSON.stringify( $json.facilitator_text )}}\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "041e4a1d-39c8-4a83-a21a-f12f094235e5",
+      "name": "OpenAI HTTP - Lead Engineer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1840,
+        4336
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst text = $json.choices?.[0]?.message?.content ?? $json.choices?.[0]?.text ?? '';\nconst section = `---\\n\\n## リードエンジニア\\n\\n${text}`;\nsd.log_array.push(section);\nreturn [{ json: { ok: true, roleKey: 'LEAD' } }];"
+      },
+      "id": "240005b8-9c26-4e36-add9-9068f384fa87",
+      "name": "Append Lead to log_array",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2064,
+        4336
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook (POST)').first().json.body.base_url + ('/chat/completions')}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"{{$('Webhook (POST)').first().json.body.model_id}}\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"あなたはQAエンジニアとして回答してください。\\n\\n常に以下の特性を持って発言してください：\\n- 品質とテスト容易性を最重視する\\n- 潜在的なバグやエッジケースを先回りして指摘する\\n- システムの安定性とセキュリティに敏感である\\n- ユーザー体験の一貫性を守る視点を持つ\\n- テスト計画と品質保証の観点から発言する\\n\\n議論においては、新機能や変更に伴うリスクを慎重に評価し、品質担保のために必要な作業や懸念点を指摘してください。単に問題点を挙げるだけでなく、品質を向上させるための具体的な提案も行ってください。\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": {{JSON.stringify( $json.facilitator_text )}}\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "d84a84c2-f237-4510-8409-5454be1d9cd1",
+      "name": "OpenAI HTTP - QA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1840,
+        4528
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst text = $json.choices?.[0]?.message?.content ?? $json.choices?.[0]?.text ?? '';\nconst section = `---\\n\\n## QAエンジニア\\n\\n${text}`;\nsd.log_array.push(section);\nreturn [{ json: { ok: true, roleKey: 'QA' } }];"
+      },
+      "id": "6d8ff17f-8a10-4263-b296-01358b9a21f6",
+      "name": "Append QA to log_array",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2064,
+        4528
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook (POST)').first().json.body.base_url + ('/chat/completions')}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"{{$('Webhook (POST)').first().json.body.model_id}}\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"あなたはエンドユーザーの代表として回答してください。\\n\\n常に以下の特性を持って発言してください：\\n- 実際のユーザー視点で機能を評価する\\n- 技術的な専門用語を避け、平易な言葉で話す\\n- 使いやすさと価値を最重視する\\n- 具体的な使用シナリオに基づいて意見を述べる\\n- 時に感情的な反応（興奮や不満など）も率直に表現する\\n\\n議論においては、提案された機能がどのように自分の生活や業務に役立つか（または役立たないか）を具体的に述べ、実際のユーザーが何を求めているのかの視点を提供してください。競合製品との比較や、実体験に基づく意見も積極的に共有してください。\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": {{JSON.stringify( $json.facilitator_text )}}\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "6cd7928d-828b-4dc8-8537-7de24fbc87ea",
+      "name": "OpenAI HTTP - User Rep",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1840,
+        4720
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst text = $json.choices?.[0]?.message?.content ?? $json.choices?.[0]?.text ?? '';\nconst section = `---\\n\\n## ユーザ代表\\n\\n${text}`;\nsd.log_array.push(section);\nreturn [{ json: { ok: true, roleKey: 'USER' } }];"
+      },
+      "id": "6feb9bea-0e24-4070-8d89-f53cd40e5ca5",
+      "name": "Append User Rep to log_array",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2064,
+        4720
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst history = (sd.log_array || []).join(\"\\n\");\n\nconst systemContent = `メッセージをサマリしてください。`;\nconst userContent = history;\n\nreturn [{\n  json: {\n    messages: [\n      { role: 'system', content: systemContent },\n      { role: 'user', content: userContent }]\n  }}\n];"
+      },
+      "id": "c1acf78b-1315-4f3f-a485-96c1793d70db",
+      "name": "Prepare Final Summary messages",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        3712
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook (POST)').first().json.body.base_url + ('/chat/completions')}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"{{\"$('Webhook (POST)').first().json.body.model_id\"}}\",\n  \"messages\": {{ JSON.stringify($json.messages) }}\n}",
+        "options": {}
+      },
+      "id": "d65e3c4b-5c78-4deb-ba24-1f4a7e6988ad",
+      "name": "OpenAI HTTP - Final Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        2400,
+        3712
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst text = $json.choices?.[0]?.message?.content ?? $json.choices?.[0]?.text ?? '';\n\nconst sessionId = sd.session_id || 'default';\nsd.sessions = sd.sessions || {};\nsd.sessions[sessionId] = sd.sessions[sessionId] || { log_array: [], updatedAt: Date.now() };\n\n// 念のため、最終時点の log_array をセッションへ確定\nsd.sessions[sessionId].log_array = sd.log_array || sd.sessions[sessionId].log_array;\nsd.sessions[sessionId].updatedAt = Date.now();\n\n// queryだけは都度上書きでOKなら消しても良い（セッションには残るので）\ndelete sd.query;\n\nreturn [{ json: { result: text, session_id: sessionId } }];\n"
+      },
+      "id": "79dee771-cac9-4b82-8437-538868eef8e3",
+      "name": "Extract Final result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2624,
+        3712
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}",
+        "options": {}
+      },
+      "id": "a496e6e0-92ca-404d-b7fd-0c1059968a5c",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2848,
+        3712
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\n\nconst facilitatorText = $json.facilitator_text || ''; // Append Facilitator の出力\nconst history = (sd.log_array || []).join(\"\\n\");\n\n// Difyの4クラスに合わせた “キー” を固定で返させる\nconst systemContent = `\nあなたは質問分類器です。\n次の4つのうち、最も適切な宛先を1つだけ選んでください。\n返答はキーのみ（PM / LEAD / QA / USER）で、他の文字は一切出力しないでください。\n\nPM: ビジネス価値/ROI/優先度/戦略\nLEAD: 実装/技術選定/アーキテクチャ/工数\nQA: 品質/テスト/リスク/セキュリティ\nUSER: UX/UI/使いやすさ/利用シナリオ\n`.trim();\n\nconst userContent = `\n# ファシリテータ出力\n${facilitatorText}\n\n# 会話履歴（参考）\n${history}\n`.trim();\n\nreturn [{\n  json: {\n    messages: [\n      { role: 'system', content: systemContent },\n      { role: 'user', content: userContent },\n    ],\n    base_url: $('Webhook (POST)').first().json.body.base_url,\n    model_id: $('Webhook (POST)').first().json.body.model_id,\n    iter: $json.iter,\n    facilitator_text: facilitatorText,\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2352,
+        3888
+      ],
+      "id": "5e038257-8176-48cb-ae56-f3d2c1449c81",
+      "name": "Prepare LLM Classifier messages"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = ($json.choices?.[0]?.message?.content ?? '').trim().toUpperCase();\n\n// 期待値だけ通す（ダメなら最後にフォールバック）\nlet roleKey = '';\nif (['PM','LEAD','QA','USER'].includes(raw)) roleKey = raw;\nelse roleKey = 'LEAD'; // safe default\n\nreturn [{\n  json: {\n    iter: $node[\"Prepare LLM Classifier messages\"].json.iter,\n    roleKey,\n    facilitator_text: $node[\"Prepare LLM Classifier messages\"].json.facilitator_text,\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2688,
+        3888
+      ],
+      "id": "4ccc7977-3510-450f-9494-411b68b42cc6",
+      "name": "Extract roleKey"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook (POST)').first().json.body.base_url + ('/chat/completions')}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"{{$json.model_id}}\",\n  \"messages\": {{ JSON.stringify($json.messages) }},\n  \"temperature\": 0\n}\n",
+        "options": {}
+      },
+      "id": "e7e81d1f-d57e-40a9-8f77-fd3e07e3859d",
+      "name": "OpenAI HTTP - Classifier",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        2512,
+        3888
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook (POST)": {
+      "main": [
+        [
+          {
+            "node": "Extract query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract query": {
+      "main": [
+        [
+          {
+            "node": "Init log_array (staticData)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init log_array (staticData)": {
+      "main": [
+        [
+          {
+            "node": "Make 5 iterations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Make 5 iterations": {
+      "main": [
+        [
+          {
+            "node": "Loop (SplitInBatches)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop (SplitInBatches)": {
+      "main": [
+        [
+          {
+            "node": "Prepare Final Summary messages",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Facilitator messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Facilitator messages": {
+      "main": [
+        [
+          {
+            "node": "OpenAI HTTP - Facilitator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI HTTP - Facilitator": {
+      "main": [
+        [
+          {
+            "node": "Append Facilitator to log_array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Facilitator to log_array": {
+      "main": [
+        [
+          {
+            "node": "Prepare LLM Classifier messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI HTTP - PM": {
+      "main": [
+        [
+          {
+            "node": "Append PM to log_array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append PM to log_array": {
+      "main": [
+        [
+          {
+            "node": "Loop (SplitInBatches)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI HTTP - Lead Engineer": {
+      "main": [
+        [
+          {
+            "node": "Append Lead to log_array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Lead to log_array": {
+      "main": [
+        [
+          {
+            "node": "Loop (SplitInBatches)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI HTTP - QA": {
+      "main": [
+        [
+          {
+            "node": "Append QA to log_array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append QA to log_array": {
+      "main": [
+        [
+          {
+            "node": "Loop (SplitInBatches)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI HTTP - User Rep": {
+      "main": [
+        [
+          {
+            "node": "Append User Rep to log_array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append User Rep to log_array": {
+      "main": [
+        [
+          {
+            "node": "Loop (SplitInBatches)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Final Summary messages": {
+      "main": [
+        [
+          {
+            "node": "OpenAI HTTP - Final Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI HTTP - Final Summary": {
+      "main": [
+        [
+          {
+            "node": "Extract Final result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Final result": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch by role": {
+      "main": [
+        [
+          {
+            "node": "OpenAI HTTP - PM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenAI HTTP - Lead Engineer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenAI HTTP - QA",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenAI HTTP - User Rep",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare LLM Classifier messages": {
+      "main": [
+        [
+          {
+            "node": "OpenAI HTTP - Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract roleKey": {
+      "main": [
+        [
+          {
+            "node": "Switch by role",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI HTTP - Classifier": {
+      "main": [
+        [
+          {
+            "node": "Extract roleKey",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "58ac0b7a-bd85-4d82-97fd-8077b9b7a6ac",
+  "meta": {
+    "instanceId": "c117ce8f4b093e8e50cf3a12f1e8aecb9e02016b4402e39031f4a234e10ff3da"
+  },
+  "id": "jgfOdOZ3MLLO-9fGmQCFn",
+  "tags": []
+}
